@@ -1,5 +1,4 @@
 # BuilderSpacing
-Clash of clans: proper builder spacing calculator
 
 Do you ever have a time when you have too much spacing between two builders and want to build in between that time, but can't figure out how to time it right? Then this tool is for you! 
 
