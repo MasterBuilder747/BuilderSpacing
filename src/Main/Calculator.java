@@ -36,7 +36,7 @@ public class Calculator {
             throw new IllegalArgumentException("Invalid build input.");
         }
         if (b2 < b1 || b2 == b1) {
-            throw new IllegalArgumentException("First build time must be greater than second build time.");
+            throw new IllegalArgumentException("First build time must be smaller than second build time.");
         }
         //limit the max build time to 30 days as Coc build times are never that high
         //and would break the calendar system if so
@@ -47,7 +47,7 @@ public class Calculator {
         //formula: timeNeededToWaitToStartDesiredBuild =
         //build1 - [build{converted} - {builder spacing: }[(build2{converted} - build1{converted}) / 2]]
         if (b > b2) {
-            throw new IllegalArgumentException("The build time of the desired build is longer than the second build.");
+            throw new IllegalArgumentException("The build time of the desired build is longer than the second build time.");
         }
         //the spacing between b1 and b,
         //which is equal to the space between b and b2 as well
@@ -121,10 +121,10 @@ public class Calculator {
             if (hour > 12) {
                 //pm
                 hour -= 12;
-                System.out.println("You can start the build on " + month + "-" + day + "-" + year + " at approximately " + hour + "pm");
+                System.out.println("You can start the build on " + month + "-" + day + "-" + year + " at approximately " + hour + " pm");
             } else {
                 //am
-                System.out.println("You can start the build on " + month + "-" + day + "-" + year + " at approximately " + hour + "am");
+                System.out.println("You can start the build on " + month + "-" + day + "-" + year + " at approximately " + hour + " am");
             }
         }
     }
@@ -133,36 +133,40 @@ public class Calculator {
     //format: DDdHHh or DdHh
     public static double timeToDouble(String time2) {
         String time = time2.replace(" ", "");
-        double out = -1;
+        double out;
         if (time.contains("d")) {
             out = Double.parseDouble(time.substring(0, time.indexOf("d")));
             if (time.contains("h")) {
                 double hours = Double.parseDouble(time.substring(time.indexOf("d") + 1, time.indexOf("h")));
                 //add hours to day value
-                if (hours < 24) {
-                    out += hours / 24;
-                } else {
-                    throw new IllegalArgumentException("Hours must be less than 24.");
-                }
+                out += (hours / 24);
             }
-        } else if (time.contains("h")) {
+        } else {
             //hours only
             out = Double.parseDouble(time.substring(0, time.indexOf("h"))) / 24;
         }
         return out;
     }
     public static int[] doubleToTime(double d) {
-        int[] out = null;
-        if (d > 1) {
-            //days, hours
+        int[] out;
+        if (d > -0.00001 && d < 0.00001) {
+            //d = 0
+            out = new int[0];
+        } else if (d > 1 || d < -1) {
+            //days, hours (includes negative values)
             out = new int[2];
             out[0] = (int)d;
             out[1] = (int)Math.round(24 * (d - out[0]));
-        } else if (d == 1) {
+        } else if (d-(int)d < 0.00001 && (d > 0.99999 || d < -0.99999)) {
+            //hours = 0, works with negative
             out = new int[2];
             out[0] = (int)d;
         } else if (d < 1 && d > 0) {
-            //hours
+            //hours only
+            out = new int[1];
+            out[0] = (int)Math.round(24 * d);
+        } else {
+            //hours only, negative
             out = new int[1];
             out[0] = (int)Math.round(24 * d);
         }
